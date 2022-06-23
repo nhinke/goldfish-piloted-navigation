@@ -15,13 +15,17 @@ class gpn_coordinator : public rclcpp::Node {
 
         gpn_coordinator() : Node("gpn_coordinator") {
 
+            int num;
+            this->get_parameter_or("number", num, int(4));
+            std::cout << num << std::endl;
+
             std::string odometry_topic_name;
             std::string odometry_topic_param = "odometry_topic";
-            this->get_parameter_or(odometry_topic_param, odometry_topic_name, std::string("/odom"));
+            this->get_parameter_or(odometry_topic_param, odometry_topic_name, std::string("odom"));
      
             std::string fish_command_topic_name;
             std::string fish_command_topic_param = "fish_command_topic";
-            this->get_parameter_or(fish_command_topic_param, fish_command_topic_name, std::string("/fish_cmd"));
+            this->get_parameter_or(fish_command_topic_param, fish_command_topic_name, std::string("fish_cmd"));
             
             sub_odom = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name, 10, std::bind(&gpn_coordinator::odometry_callback, this, _1));
             sub_fish_cmd = this->create_subscription<gpn_msgs::msg::FishCmd>(fish_command_topic_name, 10, std::bind(&gpn_coordinator::fish_command_callback, this, _1));
