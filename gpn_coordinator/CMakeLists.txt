@@ -7,6 +7,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(gpn_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -34,6 +35,7 @@ target_compile_definitions(gpn_coordinator
   PRIVATE "GPN_COORDINATOR_NODE_BUILDING_DLL"
 )
 ament_target_dependencies(gpn_coordinator 
+  tf2
   rclcpp
   gpn_msgs
   std_msgs

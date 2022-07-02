@@ -1,8 +1,13 @@
 #include <memory>
 #include <string>
 #include <functional>
+
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/parameter.hpp>
+
+#include <tf2/utils.h>
+#include <tf2/transform_datatypes.h>
+
 #include <gpn_msgs/msg/fish_cmd.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -17,21 +22,21 @@ namespace gpn {
 
         private:
 
-            int num_param_test;
-            std::string odometry_topic_name;
-            std::string fish_cmd_topic_name;
+            std::string odometry_topic_name_;
+            std::string fish_cmd_topic_name_;
 
-            std::string odometry_topic_param;
-            std::string fish_cmd_topic_param;
+            std::string odometry_topic_param_;
+            std::string fish_cmd_topic_param_;
 
-            geometry_msgs::msg::Pose curr_pose;
-            geometry_msgs::msg::Twist curr_twist;
+            double curr_heading_;
+            geometry_msgs::msg::Pose curr_pose_;
+            geometry_msgs::msg::Twist curr_twist_;
 
-            bool waiting_for_init_pose;
-            geometry_msgs::msg::Pose init_pose;
+            bool waiting_for_init_pose_;
+            geometry_msgs::msg::Pose init_pose_;
 
-            rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom;
-            rclcpp::Subscription<gpn_msgs::msg::FishCmd>::SharedPtr sub_fish_cmd;
+            rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom_;
+            rclcpp::Subscription<gpn_msgs::msg::FishCmd>::SharedPtr sub_fish_cmd_;
 
         protected:
 
