@@ -25,14 +25,36 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(gpn_coordinator_node src/gpn_coordinator.cpp)
-ament_target_dependencies(gpn_coordinator_node 
+include_directories(include)
+
+add_library(gpn_coordinator SHARED
+  src/gpn_coordinator.cpp
+)
+target_compile_definitions(gpn_coordinator
+  PRIVATE "GPN_COORDINATOR_NODE_BUILDING_DLL"
+)
+ament_target_dependencies(gpn_coordinator 
   rclcpp
   gpn_msgs
   std_msgs
   nav_msgs
   geometry_msgs
   irobot_create_msgs
+)
+
+add_executable(gpn_coordinator_node src/gpn_coordinator_node.cpp)
+target_link_libraries(gpn_coordinator_node
+  gpn_coordinator
+)
+ament_target_dependencies(gpn_coordinator_node 
+  rclcpp
+)
+
+install(TARGETS
+  gpn_coordinator
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(TARGETS
@@ -44,5 +66,10 @@ install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}
 )
+
+# install(DIRECTORY
+#   config
+#   DESTINATION share/${PROJECT_NAME}
+# )
 
 ament_package()
