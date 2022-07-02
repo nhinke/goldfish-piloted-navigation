@@ -26,12 +26,14 @@ void gpn::coordinator::intialize_params() {
     odometry_topic_descriptor.name = odometry_topic_param;
     odometry_topic_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
     odometry_topic_descriptor.description = "Name of topic to which create3 odometry information is published";
+    odometry_topic_descriptor.additional_constraints = "Should be of form 'odom'";
     this->declare_parameter(odometry_topic_param, "odom", odometry_topic_descriptor);
 
     rcl_interfaces::msg::ParameterDescriptor fish_cmd_topic_descriptor;
     fish_cmd_topic_descriptor.name = fish_cmd_topic_param;
     fish_cmd_topic_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
     fish_cmd_topic_descriptor.description = "Name of topic to which fish command information is published";
+    fish_cmd_topic_descriptor.additional_constraints = "Should be of form 'fish_cmd'";
     this->declare_parameter(fish_cmd_topic_param, "fish_cmd", fish_cmd_topic_descriptor);
 
 }
