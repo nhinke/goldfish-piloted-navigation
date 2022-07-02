@@ -1,0 +1,4 @@
+gpn_coordinator:
+  ros__parameters:
+    odometry_topic: "odom"
+    fish_cmd_topic: "fish_cmd"    
