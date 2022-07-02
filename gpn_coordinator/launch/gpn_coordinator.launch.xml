@@ -1,15 +1,13 @@
 <launch>
 
-    <arg name="number" default="7"/>
-    <arg name="gpn_namespace" default="gpn"/>
+    <!-- <arg name="gpn_namespace" default="gpn"/> -->
     <arg name="odometry_topic_name" default="odom"/>
-    <arg name="fish_command_topic_name" default="fish_cmd"/>
+    <arg name="fish_cmd_topic_name" default="fish_cmd"/>
  
     <!-- <node pkg="gpn_coordinator" exec="gpn_coordinator_node" name="gpn_coordinator" namespace="$(var gpn_namespace)" output="screen"> -->
     <node pkg="gpn_coordinator" exec="gpn_coordinator_node" name="gpn_coordinator" output="screen">
         <param name="odometry_topic" value="$(var odometry_topic_name)"/>
-        <param name="fish_command_topic" value="$(var fish_command_topic_name)"/>
-        <param name="number" value="$(var number)"/>
+        <param name="fish_cmd_topic" value="$(var fish_cmd_topic_name)"/>
     </node>
 
 </launch>
