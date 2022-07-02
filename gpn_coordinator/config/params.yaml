@@ -2,3 +2,5 @@ gpn_coordinator:
   ros__parameters:
     odometry_topic: "odom"
     fish_cmd_topic: "fish_cmd"    
+    max_lin_vel: 2.0
+    max_ang_vel: 1.5
