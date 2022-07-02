@@ -1,15 +1,15 @@
 <launch>
 
     <!-- <arg name="gpn_namespace" default="gpn"/> -->
-    <let name="param_config_file" value="$(find-pkg-share gpn_coordinator)/config/params.yaml"/>
     <!-- <arg name="odometry_topic_name" default="odom"/> -->
     <!-- <arg name="fish_cmd_topic_name" default="fish_cmd"/> -->
- 
-    <!-- <node pkg="gpn_coordinator" exec="gpn_coordinator_node" name="gpn_coordinator" namespace="$(var gpn_namespace)" output="screen"> -->
+
+    <let name="param_config_file" value="$(find-pkg-share gpn_coordinator)/config/params.yaml"/>
+     
     <node pkg="gpn_coordinator" exec="gpn_coordinator_node" name="gpn_coordinator" output="screen">
+        <param from="$(var param_config_file)"/>
         <!-- <param name="odometry_topic" value="$(var odometry_topic_name)"/> -->
         <!-- <param name="fish_cmd_topic" value="$(var fish_cmd_topic_name)"/> -->
-        <param from="$(var param_config_file)"/>
     </node>
 
 </launch>
