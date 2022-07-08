@@ -1,0 +1,5 @@
+gpn_pid_controller:
+  ros__parameters:
+    pid_controller_gain_P: 1.0
+    pid_controller_gain_I: 0.0    
+    pid_controller_gain_D: 0.1     

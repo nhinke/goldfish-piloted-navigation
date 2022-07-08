@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(PID_controller)
+project(pid_controller)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -25,5 +25,53 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+include_directories(include)
+
+add_library(gpn_pid_controller SHARED
+  src/pid_controller.cpp
+)
+target_compile_definitions(gpn_pid_controller
+  PRIVATE "GPN_PID_CONTROLLER_NODE_BUILDING_DLL"
+)
+ament_target_dependencies(gpn_pid_controller 
+  tf2
+  rclcpp
+  gpn_msgs
+  std_msgs
+  nav_msgs
+  geometry_msgs
+  irobot_create_msgs
+)
+
+add_executable(gpn_pid_controller_node src/pid_controller_node.cpp)
+target_link_libraries(gpn_pid_controller_node
+  gpn_pid_controller
+)
+ament_target_dependencies(gpn_pid_controller_node 
+  rclcpp
+)
+
+install(TARGETS
+  gpn_pid_controller
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(TARGETS
+  gpn_pid_controller_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_package()
