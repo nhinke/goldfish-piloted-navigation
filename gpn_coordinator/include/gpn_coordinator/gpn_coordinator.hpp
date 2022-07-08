@@ -47,7 +47,7 @@ namespace gpn {
 
             coordinator(const std::string& name, const rclcpp::NodeOptions& options);
             ~coordinator();
-            void intialize_params();
+            void initialize_params();
             void configure();
 
     };

@@ -5,7 +5,7 @@ using std::placeholders::_1;
 gpn::coordinator::coordinator(const std::string& name, const rclcpp::NodeOptions& options) : 
     Node(name, options), waiting_for_init_pose_(true) {
 
-    this->intialize_params();
+    this->initialize_params();
     this->configure();
     
     sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name_, 10, std::bind(&gpn::coordinator::odometry_callback, this, _1));
@@ -17,7 +17,7 @@ gpn::coordinator::coordinator(const std::string& name, const rclcpp::NodeOptions
 
 gpn::coordinator::~coordinator() {}
 
-void gpn::coordinator::intialize_params() {
+void gpn::coordinator::initialize_params() {
 
     odometry_topic_param_ = "odometry_topic";
     fish_cmd_topic_param_ = "fish_cmd_topic";
