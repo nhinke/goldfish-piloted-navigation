@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(pid_controller)
+project(gpn_pid_controller)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -29,7 +29,7 @@ endif()
 include_directories(include)
 
 add_library(gpn_pid_controller SHARED
-  src/pid_controller.cpp
+  src/gpn_pid_controller.cpp
 )
 target_compile_definitions(gpn_pid_controller
   PRIVATE "GPN_PID_CONTROLLER_NODE_BUILDING_DLL"
@@ -44,7 +44,7 @@ ament_target_dependencies(gpn_pid_controller
   irobot_create_msgs
 )
 
-add_executable(gpn_pid_controller_node src/pid_controller_node.cpp)
+add_executable(gpn_pid_controller_node src/gpn_pid_controller_node.cpp)
 target_link_libraries(gpn_pid_controller_node
   gpn_pid_controller
 )

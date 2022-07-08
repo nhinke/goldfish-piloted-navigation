@@ -1,6 +1,6 @@
 #include <string>
 #include <rclcpp/rclcpp.hpp>
-#include <pid_controller/pid_controller.hpp>
+#include <gpn_pid_controller/gpn_pid_controller.hpp>
 
 int main(int argc, char * argv[]) {
 

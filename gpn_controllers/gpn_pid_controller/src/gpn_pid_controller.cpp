@@ -1,4 +1,4 @@
-#include <pid_controller/pid_controller.hpp>
+#include <gpn_pid_controller/gpn_pid_controller.hpp>
 
 gpn::pid_controller::pid_controller(const std::string& name, const rclcpp::NodeOptions& options) : 
     Node(name, options) {
