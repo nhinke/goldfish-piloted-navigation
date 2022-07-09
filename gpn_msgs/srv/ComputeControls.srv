@@ -1,0 +1,5 @@
+# current and goal
+gpn_msgs/GpnOdom curr_odom
+gpn_msgs/GpnOdom goal_odom
+---
+geometry_msgs/Twist cmd_vel
