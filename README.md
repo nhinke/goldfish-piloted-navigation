@@ -6,6 +6,6 @@ The purpose of this repo is to develop a system that allows a goldfish to pilot 
 
 ### References
   
-This project was inspired by [this](https://www.sciencedirect.com/science/article/abs/pii/S0166432821005994?dgcid=author#fig0005) similar "Fish Operated Vehicle" built for a research project at Ben-Gurion University.  
+This project was inspired by [this](https://doi.org/10.1016/j.bbr.2021.113711) similar "Fish Operated Vehicle" built for a research project at Ben-Gurion University. Cited as:
 
-* **Givon, Shachar et al**. *From fish out of water to new insights on navigation mechanisms in animals*. Behavioural Brain Research 419 (2022). https://doi.org/10.1016/j.bbr.2021.113711.
+**Givon, Shachar et al**. *From fish out of water to new insights on navigation mechanisms in animals*. Behavioural Brain Research 419 (2022). https://doi.org/10.1016/j.bbr.2021.113711.
