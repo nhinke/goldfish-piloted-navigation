@@ -1,3 +1,7 @@
+/**:
+  ros__parameters:
+    pid_controller_server: "compute_pid_controls"
+
 gpn_coordinator:
   ros__parameters:
     odometry_topic: "odom"

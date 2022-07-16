@@ -1,15 +1,13 @@
 #include <gpn_coordinator/gpn_coordinator.hpp>
 
-using std::placeholders::_1;
-
 gpn::coordinator::coordinator(const std::string& name, const rclcpp::NodeOptions& options) : 
     Node(name, options), waiting_for_init_pose_(true) {
 
     this->initialize_params();
     this->configure();
     
-    sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name_, 10, std::bind(&gpn::coordinator::odometry_callback, this, _1));
-    sub_fish_cmd_ = this->create_subscription<gpn_msgs::msg::FishCmd>(fish_cmd_topic_name_, 10, std::bind(&gpn::coordinator::fish_command_callback, this, _1));
+    sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name_, 10, std::bind(&gpn::coordinator::odometry_callback, this, std::placeholders::_1));
+    sub_fish_cmd_ = this->create_subscription<gpn_msgs::msg::FishCmd>(fish_cmd_topic_name_, 10, std::bind(&gpn::coordinator::fish_command_callback, this, std::placeholders::_1));
 
     std::cout << "gpn_coordinator_node constructed successfully" << std::endl;
 
@@ -21,6 +19,7 @@ void gpn::coordinator::initialize_params() {
 
     odometry_topic_param_ = "odometry_topic";
     fish_cmd_topic_param_ = "fish_cmd_topic";
+    server_pid_name_param_ = "pid_controller_server";
 
     rcl_interfaces::msg::ParameterDescriptor odometry_topic_descriptor;
     odometry_topic_descriptor.name = odometry_topic_param_;
@@ -36,15 +35,25 @@ void gpn::coordinator::initialize_params() {
     fish_cmd_topic_descriptor.additional_constraints = "Should be of form 'fish_cmd', for example";
     this->declare_parameter(fish_cmd_topic_param_, "fish_cmd", fish_cmd_topic_descriptor);
 
+    rcl_interfaces::msg::ParameterDescriptor server_pid_name_descriptor;
+    server_pid_name_descriptor.name = server_pid_name_param_;
+    server_pid_name_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
+    server_pid_name_descriptor.description = "Name of server used to compute PID controls";
+    server_pid_name_descriptor.additional_constraints = "Should be of form 'compute_pid_controls', for example";
+    this->declare_parameter(server_pid_name_param_, "compute_pid_controls", server_pid_name_descriptor);
+
 }
 
 void gpn::coordinator::configure() {
 
     this->get_parameter<std::string>(odometry_topic_param_, odometry_topic_name_);
-    std::cout << "odometry topic: " << odometry_topic_name_ << std::endl;
+    std::cout << "odometry topic:     " << odometry_topic_name_ << std::endl;
 
     this->get_parameter<std::string>(fish_cmd_topic_param_, fish_cmd_topic_name_);
     std::cout << "fish command topic: " << fish_cmd_topic_name_ << std::endl;
+
+    this->get_parameter<std::string>(server_pid_name_param_, server_pid_name_);
+    std::cout << "PID controller server name: " << server_pid_name_ << std::endl;
 
 }
 

@@ -22,11 +22,13 @@ namespace gpn {
 
         private:
 
-            std::string odometry_topic_name_;
-            std::string fish_cmd_topic_name_;
-
             std::string odometry_topic_param_;
             std::string fish_cmd_topic_param_;
+            std::string server_pid_name_param_;
+
+            std::string odometry_topic_name_;
+            std::string fish_cmd_topic_name_;
+            std::string server_pid_name_;
 
             double curr_heading_;
             geometry_msgs::msg::Pose curr_pose_;
