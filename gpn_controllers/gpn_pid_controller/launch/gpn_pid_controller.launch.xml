@@ -1,6 +1,7 @@
 <launch>
 
-    <let name="param_config_file" value="$(find-pkg-share gpn_pid_controller)/config/params.yaml"/>
+    <let name="param_config_file" value="$(find-pkg-share gpn_config)/config/gpn_ros_params.yaml"/>
+    <!-- <let name="param_config_file" value="$(find-pkg-share gpn_pid_controller)/config/params.yaml"/> -->
      
     <node pkg="gpn_pid_controller" exec="gpn_pid_controller_node" name="gpn_pid_controller" output="screen">
         <param from="$(var param_config_file)"/>

@@ -1,3 +1,4 @@
+# DEPRECATED, SEE gpn_config/config/gpn_ros_params.yaml
 gpn_pid_controller:
   ros__parameters:
     pid_controller_gain_P: 1.0
