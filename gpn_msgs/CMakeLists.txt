@@ -10,10 +10,18 @@ find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs)
 find_package(rosidl_default_generators REQUIRED)
 
-rosidl_generate_interfaces(${PROJECT_NAME}
+set(msg_files
   "msg/GpnOdom.msg"
   "msg/FishCmd.msg"
+)
+set(srv_files
   "srv/ComputeControls.srv"
+)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${msg_files}
+  ${srv_files}
+  DEPENDENCIES geometry_msgs
 )
 
 if(BUILD_TESTING)
