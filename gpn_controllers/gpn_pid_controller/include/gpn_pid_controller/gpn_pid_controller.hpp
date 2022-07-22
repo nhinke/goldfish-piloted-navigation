@@ -17,6 +17,9 @@ namespace gpn {
 
         private:
 
+            double max_lin_vel_, max_ang_vel_;
+            std::string max_lin_vel_param_, max_ang_vel_param_;
+
             std::string gain_P_param_;
             std::string gain_I_param_;
             std::string gain_D_param_;

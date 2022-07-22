@@ -17,9 +17,25 @@ gpn::coordinator::~coordinator() {}
 
 void gpn::coordinator::initialize_params() {
 
+    max_lin_vel_param_ = "max_lin_vel";
+    max_ang_vel_param_ = "max_ang_vel";
     odometry_topic_param_ = "odometry_topic";
     fish_cmd_topic_param_ = "fish_cmd_topic";
     server_pid_name_param_ = "pid_controller_server";
+
+    rcl_interfaces::msg::ParameterDescriptor max_lin_vel_descriptor;
+    max_lin_vel_descriptor.name = max_lin_vel_param_;
+    max_lin_vel_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_DOUBLE;
+    max_lin_vel_descriptor.description = "Maximum commanded forward velocity of create3 (m/s)";
+    max_lin_vel_descriptor.additional_constraints = "Should be of form 1.0, for example";
+    this->declare_parameter(max_lin_vel_param_, 1.0, max_lin_vel_descriptor);
+
+    rcl_interfaces::msg::ParameterDescriptor max_ang_vel_descriptor;
+    max_ang_vel_descriptor.name = max_ang_vel_param_;
+    max_ang_vel_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_DOUBLE;
+    max_ang_vel_descriptor.description = "Maximum commanded angular velocity of create3 (m/s)";
+    max_ang_vel_descriptor.additional_constraints = "Should be of form 1.0, for example";
+    this->declare_parameter(max_ang_vel_param_, 1.0, max_ang_vel_descriptor);
 
     rcl_interfaces::msg::ParameterDescriptor odometry_topic_descriptor;
     odometry_topic_descriptor.name = odometry_topic_param_;
@@ -46,11 +62,17 @@ void gpn::coordinator::initialize_params() {
 
 void gpn::coordinator::configure() {
 
+    this->get_parameter<double>(max_lin_vel_param_, max_lin_vel_);
+    std::cout << "max linear velocity (m/s):  " << max_lin_vel_ << std::endl;
+
+    this->get_parameter<double>(max_ang_vel_param_, max_ang_vel_);
+    std::cout << "max angular velocity (m/s): " << max_ang_vel_ << std::endl;
+
     this->get_parameter<std::string>(odometry_topic_param_, odometry_topic_name_);
-    std::cout << "odometry topic:     " << odometry_topic_name_ << std::endl;
+    std::cout << "create3 odometry topic:     " << odometry_topic_name_ << std::endl;
 
     this->get_parameter<std::string>(fish_cmd_topic_param_, fish_cmd_topic_name_);
-    std::cout << "fish command topic: " << fish_cmd_topic_name_ << std::endl;
+    std::cout << "fish command topic:         " << fish_cmd_topic_name_ << std::endl;
 
     this->get_parameter<std::string>(server_pid_name_param_, server_pid_name_);
     std::cout << "PID controller server name: " << server_pid_name_ << std::endl;

@@ -22,6 +22,9 @@ namespace gpn {
 
         private:
 
+            double max_lin_vel_, max_ang_vel_;
+            std::string max_lin_vel_param_, max_ang_vel_param_;
+
             std::string odometry_topic_param_;
             std::string fish_cmd_topic_param_;
             std::string server_pid_name_param_;
