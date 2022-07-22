@@ -13,6 +13,8 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 
+#define FIXED_FLOAT(x) std::fixed << std::setprecision(2) << (x)
+
 #ifndef GPN_COORDINATOR_COMPONENT
 #define GPN_COORDINATOR_COMPONENT
 

@@ -1,8 +1,8 @@
 /**:
   ros__parameters:
     pid_controller_server: 'compute_pid_controls'
-    max_lin_vel: 2.0
-    max_ang_vel: 1.5
+    max_lin_vel: 2.0 # m/s
+    max_ang_vel: 1.5 # rad/s
 
 gpn_coordinator:
   ros__parameters:
@@ -11,9 +11,10 @@ gpn_coordinator:
 
 gpn_pid_controller:
   ros__parameters:
-    pid_controller_gain_lin_P: 1.0
-    pid_controller_gain_lin_I: 0.0
-    pid_controller_gain_lin_D: 0.1
-    pid_controller_gain_ang_P: 1.0
-    pid_controller_gain_ang_I: 0.0
-    pid_controller_gain_ang_D: 0.1          
+    pid_gain_lin_P: 1.0
+    pid_gain_lin_I: 0.0
+    pid_gain_lin_D: 0.1
+    pid_gain_ang_P: 1.0
+    pid_gain_ang_I: 0.0
+    pid_gain_ang_D: 0.1          
+    pid_D_term_max_time_threshold: 3.0 # sec
