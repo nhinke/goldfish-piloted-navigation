@@ -27,13 +27,11 @@ namespace gpn {
             double max_lin_vel_, max_ang_vel_;
             std::string max_lin_vel_param_, max_ang_vel_param_;
 
-            std::string odometry_topic_param_;
-            std::string fish_cmd_topic_param_;
-            std::string controller_server_name_param_;
+            std::string odometry_topic_name_, fish_cmd_topic_name_;
+            std::string odometry_topic_param_, fish_cmd_topic_param_;
 
-            std::string odometry_topic_name_;
-            std::string fish_cmd_topic_name_;
             std::string controller_server_name_;
+            std::string controller_server_name_param_;
 
             double curr_heading_;
             geometry_msgs::msg::Pose curr_pose_;
