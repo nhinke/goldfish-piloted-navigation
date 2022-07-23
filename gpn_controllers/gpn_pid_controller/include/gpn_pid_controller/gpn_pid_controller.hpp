@@ -39,7 +39,7 @@ namespace gpn {
             double prev_err_lin_, prev_err_ang_; // previous
             double accu_err_lin_, accu_err_ang_; // accumulated
 
-            rclcpp::Service<gpn_msgs::srv::ComputeControls>::SharedPtr server_ctrls_;
+            rclcpp::Service<gpn_msgs::srv::ComputeControls>::SharedPtr server_controller_;
 
         protected:
 

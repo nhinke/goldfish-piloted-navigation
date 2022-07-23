@@ -6,7 +6,7 @@ gpn::pid_controller::pid_controller(const std::string& name, const rclcpp::NodeO
     this->initialize_params();
     this->configure();
 
-    server_ctrls_ = this->create_service<gpn_msgs::srv::ComputeControls>(controller_server_name_, std::bind(&gpn::pid_controller::compute_controls_callback, this, std::placeholders::_1, std::placeholders::_2));
+    server_controller_ = this->create_service<gpn_msgs::srv::ComputeControls>(controller_server_name_, std::bind(&gpn::pid_controller::compute_controls_callback, this, std::placeholders::_1, std::placeholders::_2));
 
     std::cout << "gpn_pid_controller_node constructed successfully" << std::endl;
 

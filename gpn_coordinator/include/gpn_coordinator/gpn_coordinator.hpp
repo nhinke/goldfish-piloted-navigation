@@ -1,5 +1,6 @@
 #include <memory>
 #include <string>
+#include <chrono>
 #include <functional>
 
 #include <rclcpp/rclcpp.hpp>
@@ -9,6 +10,8 @@
 #include <tf2/transform_datatypes.h>
 
 #include <gpn_msgs/msg/fish_cmd.hpp>
+#include <gpn_msgs/srv/compute_controls.hpp>
+
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -42,6 +45,8 @@ namespace gpn {
 
             rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom_;
             rclcpp::Subscription<gpn_msgs::msg::FishCmd>::SharedPtr sub_fish_cmd_;
+
+            rclcpp::Client<gpn_msgs::srv::ComputeControls>::SharedPtr client_controller_;
 
         protected:
 

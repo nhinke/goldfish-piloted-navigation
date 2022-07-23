@@ -9,6 +9,15 @@ gpn::coordinator::coordinator(const std::string& name, const rclcpp::NodeOptions
     sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name_, 10, std::bind(&gpn::coordinator::odometry_callback, this, std::placeholders::_1));
     sub_fish_cmd_ = this->create_subscription<gpn_msgs::msg::FishCmd>(fish_cmd_topic_name_, 10, std::bind(&gpn::coordinator::fish_command_callback, this, std::placeholders::_1));
 
+    // TODO: add param to set controller service timeout, and cleanup below (and consider what should happen if controller not available)
+    client_controller_ = this->create_client<gpn_msgs::srv::ComputeControls>(controller_server_name_);
+    rclcpp::Time now = this->now();
+    if (!client_controller_->wait_for_service(std::chrono::seconds(3))) {
+        std::cout << "error: waited for " << (this->now() - now).seconds() << " seconds" << std::endl;
+    } else {
+        std::cout << "success: waited for " << (this->now() - now).seconds() << " seconds" << std::endl;
+    }
+
     std::cout << "gpn_coordinator_node constructed successfully" << std::endl;
 
 }
