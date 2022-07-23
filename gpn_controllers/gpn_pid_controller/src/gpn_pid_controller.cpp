@@ -6,7 +6,7 @@ gpn::pid_controller::pid_controller(const std::string& name, const rclcpp::NodeO
     this->initialize_params();
     this->configure();
 
-    server_ctrls_ = this->create_service<gpn_msgs::srv::ComputeControls>(server_pid_name_, std::bind(&gpn::pid_controller::compute_controls_callback, this, std::placeholders::_1, std::placeholders::_2));
+    server_ctrls_ = this->create_service<gpn_msgs::srv::ComputeControls>(controller_server_name_, std::bind(&gpn::pid_controller::compute_controls_callback, this, std::placeholders::_1, std::placeholders::_2));
 
     std::cout << "gpn_pid_controller_node constructed successfully" << std::endl;
 
@@ -24,7 +24,7 @@ void gpn::pid_controller::initialize_params() {
     gain_ang_P_param_ = "pid_gain_ang_P";
     gain_ang_I_param_ = "pid_gain_ang_I";
     gain_ang_D_param_ = "pid_gain_ang_D";
-    server_pid_name_param_ = "pid_controller_server";
+    controller_server_name_param_ = "controller_server";
     max_time_thresh_D_param_ = "pid_D_term_max_time_threshold";
 
     rcl_interfaces::msg::ParameterDescriptor max_lin_vel_descriptor;
@@ -83,12 +83,12 @@ void gpn::pid_controller::initialize_params() {
     gain_ang_D_descriptor.additional_constraints = "Should be of form 0.1, for example";
     this->declare_parameter(gain_ang_D_param_, 0.1, gain_ang_D_descriptor);
 
-    rcl_interfaces::msg::ParameterDescriptor server_pid_name_descriptor;
-    server_pid_name_descriptor.name = server_pid_name_param_;
-    server_pid_name_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
-    server_pid_name_descriptor.description = "Name of server used to compute PID controls";
-    server_pid_name_descriptor.additional_constraints = "Should be of form 'compute_pid_controls', for example";
-    this->declare_parameter(server_pid_name_param_, "compute_pid_controls", server_pid_name_descriptor);
+    rcl_interfaces::msg::ParameterDescriptor controller_server_name_descriptor;
+    controller_server_name_descriptor.name = controller_server_name_param_;
+    controller_server_name_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
+    controller_server_name_descriptor.description = "Name of server used to compute PID controls";
+    controller_server_name_descriptor.additional_constraints = "Should be of form 'compute_control_inputs', for example";
+    this->declare_parameter(controller_server_name_param_, "compute_control_inputs", controller_server_name_descriptor);
 
     rcl_interfaces::msg::ParameterDescriptor max_time_thresh_D_vel_descriptor;
     max_time_thresh_D_vel_descriptor.name = max_time_thresh_D_param_;
@@ -128,8 +128,8 @@ void gpn::pid_controller::configure() {
     this->get_parameter<double>(max_time_thresh_D_param_, max_time_thresh_D_);
     std::cout << "Max time threshold for derivative term: " << FIXED_FLOAT(max_time_thresh_D_) << std::endl;
 
-    this->get_parameter<std::string>(server_pid_name_param_, server_pid_name_);
-    std::cout << "PID controller server name:             " << server_pid_name_ << std::endl;
+    this->get_parameter<std::string>(controller_server_name_param_, controller_server_name_);
+    std::cout << "Controller server name:                 " << controller_server_name_ << std::endl;
 
 }
 

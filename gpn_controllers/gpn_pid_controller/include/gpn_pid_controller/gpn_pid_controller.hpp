@@ -22,8 +22,8 @@ namespace gpn {
             double max_lin_vel_, max_ang_vel_;
             std::string max_lin_vel_param_, max_ang_vel_param_;
 
-            std::string server_pid_name_;
-            std::string server_pid_name_param_;
+            std::string controller_server_name_;
+            std::string controller_server_name_param_;
 
             double max_time_thresh_D_;
             std::string max_time_thresh_D_param_;
