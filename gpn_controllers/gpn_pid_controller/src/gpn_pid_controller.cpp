@@ -144,8 +144,8 @@ void gpn::pid_controller::configure() {
 
 }
 
-void gpn::pid_controller::compute_controls_callback(const std::shared_ptr<gpn_msgs::srv::ComputeControls::Request> request,
-    std::shared_ptr<gpn_msgs::srv::ComputeControls::Response> response) {
+void gpn::pid_controller::compute_controls_callback(const gpn_msgs::srv::ComputeControls::Request::SharedPtr request,
+    gpn_msgs::srv::ComputeControls::Response::SharedPtr response) {
 
     double cmd_lin = 0.0;
     double cmd_ang = 0.0;

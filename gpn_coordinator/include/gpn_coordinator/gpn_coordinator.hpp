@@ -43,6 +43,7 @@ namespace gpn {
             std::string controller_timeout_param_;
 
             double curr_heading_;
+            rclcpp::Time curr_odom_time_;
             geometry_msgs::msg::Pose curr_pose_;
             geometry_msgs::msg::Twist curr_twist_;
 

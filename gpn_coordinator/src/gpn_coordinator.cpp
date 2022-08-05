@@ -112,6 +112,7 @@ void gpn::coordinator::configure() {
 
 void gpn::coordinator::odometry_callback(const nav_msgs::msg::Odometry& odom_msg) {
 
+    curr_odom_time_ = odom_msg.header.stamp;
     curr_pose_ = odom_msg.pose.pose;
     curr_twist_ = odom_msg.twist.twist;
     curr_heading_ = tf2::getYaw(curr_pose_.orientation);
@@ -128,12 +129,34 @@ void gpn::coordinator::odometry_callback(const nav_msgs::msg::Odometry& odom_msg
 }
 
 void gpn::coordinator::fish_command_callback(const gpn_msgs::msg::FishCmd& cmd_msg) {
-    
+
+    if (waiting_for_init_pose_) {
+        std::cout << "ERROR: cannot accept any fish commands until odometry information received" << std::endl;
+        return;
+    }
+
     double cmd_heading = cmd_msg.heading;
     double cmd_magnitude = cmd_msg.magnitude;    
 
     if (debug_) {
-        std::cout << "fish command:  " << cmd_heading << "  " << cmd_magnitude << std::endl;
+        std::cout << "Received fish command:  " << cmd_heading << "  " << cmd_magnitude << std::endl;
     }
+
+    std::shared_ptr<gpn_msgs::srv::ComputeControls::Request> ctrls_srv_req;
+    ctrls_srv_req->curr_odom.heading = curr_heading_;
+    ctrls_srv_req->curr_odom.fwd_vel = curr_twist_.linear.x;
+    ctrls_srv_req->curr_odom.header.stamp = curr_odom_time_;
+    
+    // auto ctrls_srv_res = client_controller_->async_send_request(ctrls_srv_req);
+
+    // TODO: implement timer-based publisher of velocity commands to robot with configurable frequency,
+    //       be sure to consider what happens if you haven't received a fish command for a while --> whether to keep sending same command or start sending zeros)
+
+    // TODO: decide how to handle calling service within callback:
+    //           - option 1: use multi-threaded executor with reentrant callback group
+    //           - option 2: use multi-threaded executor with two mutually-exclusive callback groups
+    //           - option 3: provide callback with asynchronous server request and publish most recent command in timer callback (must not be reentrant callback groups (i.e. singlethreaded exec or multithreaded exec w/ ME callback groups) to prevent data race for latest command, could get weird)
+    //       I'm thinking option 2 or 3 --> https://docs.ros.org/en/foxy/How-To-Guides/Using-callback-groups.html
+    //       I'm thinking option 3 with a single-threaded executor to prevent any chance of data races (just keep everything asynchronous)
 
 }
