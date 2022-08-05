@@ -19,6 +19,9 @@ namespace gpn {
 
         private:
 
+            bool debug_;
+            std::string debug_param_;
+
             double max_lin_vel_, max_ang_vel_;
             std::string max_lin_vel_param_, max_ang_vel_param_;
 

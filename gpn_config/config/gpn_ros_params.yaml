@@ -12,6 +12,7 @@ gpn_coordinator:
 
 gpn_pid_controller:
   ros__parameters:
+    debug_stream: true
     pid_gain_lin_P: 1.0
     pid_gain_lin_I: 0.0
     pid_gain_lin_D: 0.1

@@ -16,6 +16,7 @@ gpn::pid_controller::~pid_controller() {}
 
 void gpn::pid_controller::initialize_params() {
 
+    debug_param_ = "debug_stream";
     max_lin_vel_param_ = "max_lin_vel";
     max_ang_vel_param_ = "max_ang_vel";
     gain_lin_P_param_ = "pid_gain_lin_P";
@@ -26,6 +27,13 @@ void gpn::pid_controller::initialize_params() {
     gain_ang_D_param_ = "pid_gain_ang_D";
     controller_server_name_param_ = "controller_server";
     max_time_thresh_D_param_ = "pid_D_term_max_time_threshold";
+
+    rcl_interfaces::msg::ParameterDescriptor debug_descriptor;
+    debug_descriptor.name = debug_param_;
+    debug_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_BOOL;
+    debug_descriptor.description = "Control whether or not debugging stream printed to active terminal";
+    debug_descriptor.additional_constraints = "Should be of form false, for example";
+    this->declare_parameter(debug_param_, false, debug_descriptor);
 
     rcl_interfaces::msg::ParameterDescriptor max_lin_vel_descriptor;
     max_lin_vel_descriptor.name = max_lin_vel_param_;
@@ -100,6 +108,9 @@ void gpn::pid_controller::initialize_params() {
 }
 
 void gpn::pid_controller::configure() {
+
+    this->get_parameter<bool>(debug_param_, debug_);
+    std::cout << "Debugging stream status:                " << debug_ << std::endl;
 
     this->get_parameter<double>(max_lin_vel_param_, max_lin_vel_);
     std::cout << "Max linear velocity (m/s):              " << FIXED_FLOAT(max_lin_vel_) << std::endl;
