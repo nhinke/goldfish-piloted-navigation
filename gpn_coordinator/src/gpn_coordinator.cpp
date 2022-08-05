@@ -26,11 +26,19 @@ gpn::coordinator::~coordinator() {}
 
 void gpn::coordinator::initialize_params() {
 
+    debug_param_ = "debug_stream";
     max_lin_vel_param_ = "max_lin_vel";
     max_ang_vel_param_ = "max_ang_vel";
     odometry_topic_param_ = "odometry_topic";
     fish_cmd_topic_param_ = "fish_cmd_topic";
     controller_server_name_param_ = "controller_server";
+
+    rcl_interfaces::msg::ParameterDescriptor debug_descriptor;
+    debug_descriptor.name = debug_param_;
+    debug_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_BOOL;
+    debug_descriptor.description = "Control whether or not debugging stream printed to active terminal";
+    debug_descriptor.additional_constraints = "Should be of form false, for example";
+    this->declare_parameter(debug_param_, false, debug_descriptor);
 
     rcl_interfaces::msg::ParameterDescriptor max_lin_vel_descriptor;
     max_lin_vel_descriptor.name = max_lin_vel_param_;
@@ -71,6 +79,9 @@ void gpn::coordinator::initialize_params() {
 
 void gpn::coordinator::configure() {
 
+    this->get_parameter<bool>(debug_param_, debug_);
+    std::cout << "Debugging stream status:   " << debug_ << std::endl;
+
     this->get_parameter<double>(max_lin_vel_param_, max_lin_vel_);
     std::cout << "Max lin. velocity (m/s):   " << FIXED_FLOAT(max_lin_vel_) << std::endl;
 
@@ -93,8 +104,11 @@ void gpn::coordinator::odometry_callback(const nav_msgs::msg::Odometry& odom_msg
     curr_pose_ = odom_msg.pose.pose;
     curr_twist_ = odom_msg.twist.twist;
     curr_heading_ = tf2::getYaw(curr_pose_.orientation);
-    std::cout << "Current vehicle heading: " << curr_heading_ << std::endl;
-    
+
+    if (debug_) {
+        std::cout << "Current vehicle heading: " << curr_heading_ << std::endl;
+    }
+
     if (waiting_for_init_pose_) {
         init_pose_ = curr_pose_;
         waiting_for_init_pose_ = false;
@@ -106,6 +120,9 @@ void gpn::coordinator::fish_command_callback(const gpn_msgs::msg::FishCmd& cmd_m
     
     double cmd_heading = cmd_msg.heading;
     double cmd_magnitude = cmd_msg.magnitude;    
-    std::cout << "fish command:  " << cmd_heading << "  " << cmd_magnitude << std::endl;
+
+    if (debug_) {
+        std::cout << "fish command:  " << cmd_heading << "  " << cmd_magnitude << std::endl;
+    }
 
 }

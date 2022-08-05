@@ -6,6 +6,7 @@
 
 gpn_coordinator:
   ros__parameters:
+    debug_stream: true
     odometry_topic: "odom"
     fish_cmd_topic: "fish_cmd"
 
