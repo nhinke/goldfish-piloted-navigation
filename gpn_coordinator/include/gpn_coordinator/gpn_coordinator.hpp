@@ -39,6 +39,9 @@ namespace gpn {
             std::string controller_server_name_;
             std::string controller_server_name_param_;
 
+            int controller_timeout_sec_;
+            std::string controller_timeout_param_;
+
             double curr_heading_;
             geometry_msgs::msg::Pose curr_pose_;
             geometry_msgs::msg::Twist curr_twist_;

@@ -9,13 +9,13 @@ gpn::coordinator::coordinator(const std::string& name, const rclcpp::NodeOptions
     sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name_, 10, std::bind(&gpn::coordinator::odometry_callback, this, std::placeholders::_1));
     sub_fish_cmd_ = this->create_subscription<gpn_msgs::msg::FishCmd>(fish_cmd_topic_name_, 10, std::bind(&gpn::coordinator::fish_command_callback, this, std::placeholders::_1));
 
-    // TODO: add param to set controller service timeout, and cleanup below (and consider what should happen if controller not available)
-    client_controller_ = this->create_client<gpn_msgs::srv::ComputeControls>(controller_server_name_);
     rclcpp::Time now = this->now();
-    if (!client_controller_->wait_for_service(std::chrono::seconds(3))) {
-        std::cout << "error: waited for " << (this->now() - now).seconds() << " seconds" << std::endl;
-    } else {
-        std::cout << "success: waited for " << (this->now() - now).seconds() << " seconds" << std::endl;
+    client_controller_ = this->create_client<gpn_msgs::srv::ComputeControls>(controller_server_name_);
+    if (!client_controller_->wait_for_service(std::chrono::seconds(controller_timeout_sec_))) {
+        std::cout << "ERROR: could not connect to controller server after waiting for " << controller_timeout_sec_ << " seconds" << std::endl;
+        // TODO: decide what should happen if connection unsuccessful --> e.g. retry connect/kill node/carry on
+    } else if (debug_) {
+        std::cout << "Successfully connected to controller server at '" << controller_server_name_ << "' after " << (this->now() - now).seconds() << " seconds" << std::endl;
     }
 
     std::cout << "gpn_coordinator_node constructed successfully" << std::endl;
@@ -31,6 +31,7 @@ void gpn::coordinator::initialize_params() {
     max_ang_vel_param_ = "max_ang_vel";
     odometry_topic_param_ = "odometry_topic";
     fish_cmd_topic_param_ = "fish_cmd_topic";
+    controller_timeout_param_ = "controller_timeout";
     controller_server_name_param_ = "controller_server";
 
     rcl_interfaces::msg::ParameterDescriptor debug_descriptor;
@@ -68,6 +69,13 @@ void gpn::coordinator::initialize_params() {
     fish_cmd_topic_descriptor.additional_constraints = "Should be of form 'fish_cmd', for example";
     this->declare_parameter(fish_cmd_topic_param_, "fish_cmd", fish_cmd_topic_descriptor);
 
+    rcl_interfaces::msg::ParameterDescriptor controller_timeout_descriptor;
+    controller_timeout_descriptor.name = controller_timeout_param_;
+    controller_timeout_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_INTEGER;
+    controller_timeout_descriptor.description = "Time to wait for controller server to become available (sec)";
+    controller_timeout_descriptor.additional_constraints = "Should be of form 5, for example";
+    this->declare_parameter(controller_timeout_param_, 5, controller_timeout_descriptor);
+
     rcl_interfaces::msg::ParameterDescriptor controller_server_name_descriptor;
     controller_server_name_descriptor.name = controller_server_name_param_;
     controller_server_name_descriptor.type = rcl_interfaces::msg::ParameterType::PARAMETER_STRING;
@@ -93,6 +101,9 @@ void gpn::coordinator::configure() {
 
     this->get_parameter<std::string>(fish_cmd_topic_param_, fish_cmd_topic_name_);
     std::cout << "Fish command topic:        " << fish_cmd_topic_name_ << std::endl;
+    
+    this->get_parameter<int>(controller_timeout_param_, controller_timeout_sec_);
+    std::cout << "Controller timeout (sec):  " << controller_timeout_sec_ << std::endl;
 
     this->get_parameter<std::string>(controller_server_name_param_, controller_server_name_);
     std::cout << "Controller server name:    " << controller_server_name_ << std::endl;
