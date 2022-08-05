@@ -8,8 +8,11 @@ int main(int argc, char * argv[]) {
     std::string name = "gpn_coordinator_node";
     rclcpp::NodeOptions options;
 
+    rclcpp::executors::SingleThreadedExecutor exec;
     auto gpn_coordinator_node = std::make_shared<gpn::coordinator>(name,options);
-    rclcpp::spin(gpn_coordinator_node);
+
+    exec.add_node(gpn_coordinator_node);
+    exec.spin();
     
     rclcpp::shutdown();
     return 0;

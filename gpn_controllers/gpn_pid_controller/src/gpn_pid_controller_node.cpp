@@ -8,8 +8,11 @@ int main(int argc, char * argv[]) {
     std::string name = "gpn_pid_controller_node";
     rclcpp::NodeOptions options;
 
+    rclcpp::executors::SingleThreadedExecutor exec;
     auto gpn_pid_controller_node = std::make_shared<gpn::pid_controller>(name,options);
-    rclcpp::spin(gpn_pid_controller_node);
+
+    exec.add_node(gpn_pid_controller_node);
+    exec.spin();
     
     rclcpp::shutdown();
     return 0;
