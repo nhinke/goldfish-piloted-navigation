@@ -110,7 +110,7 @@ void gpn::pid_controller::initialize_params() {
 void gpn::pid_controller::configure() {
 
     this->get_parameter<bool>(debug_param_, debug_);
-    std::cout << "Debugging stream status:                " << debug_ << std::endl;
+    std::cout << "Debugging stream status:                " << std::boolalpha << debug_ << std::endl;
 
     this->get_parameter<double>(max_lin_vel_param_, max_lin_vel_);
     std::cout << "Max linear velocity (m/s):              " << FIXED_FLOAT(max_lin_vel_) << std::endl;

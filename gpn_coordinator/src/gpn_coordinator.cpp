@@ -80,7 +80,7 @@ void gpn::coordinator::initialize_params() {
 void gpn::coordinator::configure() {
 
     this->get_parameter<bool>(debug_param_, debug_);
-    std::cout << "Debugging stream status:   " << debug_ << std::endl;
+    std::cout << "Debugging stream status:   " << std::boolalpha << debug_ << std::endl;
 
     this->get_parameter<double>(max_lin_vel_param_, max_lin_vel_);
     std::cout << "Max lin. velocity (m/s):   " << FIXED_FLOAT(max_lin_vel_) << std::endl;
