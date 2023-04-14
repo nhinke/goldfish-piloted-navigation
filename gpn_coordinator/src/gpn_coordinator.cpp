@@ -147,6 +147,11 @@ void gpn::coordinator::fish_command_callback(const gpn_msgs::msg::FishCmd& cmd_m
     ctrls_srv_req->curr_odom.fwd_vel = curr_twist_.linear.x;
     ctrls_srv_req->curr_odom.header.stamp = curr_odom_time_;
     
+    // TODO: can create3 receive fwd and ang commands at same time?
+    ctrls_srv_req->goal_odom.heading = cmd_heading;
+    ctrls_srv_req->goal_odom.fwd_vel = cmd_magnitude*max_lin_vel_;
+    ctrls_srv_req->goal_odom.header.stamp = cmd_msg.header.stamp;
+
     // auto ctrls_srv_res = client_controller_->async_send_request(ctrls_srv_req);
 
     // TODO: implement timer-based publisher of velocity commands to robot with configurable frequency,
