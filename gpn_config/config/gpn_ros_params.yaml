@@ -7,9 +7,10 @@
 gpn_coordinator:
   ros__parameters:
     debug_stream: true
+    freq_hz: 10.0
     odometry_topic: "odom"
     fish_cmd_topic: "fish_cmd"
-    controller_timeout: 3 # sec (int)
+    controller_timeout_sec: 3.0 # sec (int)
 
 gpn_pid_controller:
   ros__parameters:

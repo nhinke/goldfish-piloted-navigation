@@ -10,6 +10,7 @@
 #include <tf2/transform_datatypes.h>
 
 #include <gpn_msgs/msg/fish_cmd.hpp>
+#include <gpn_msgs/msg/gpn_state.hpp>
 #include <gpn_msgs/srv/compute_controls.hpp>
 
 #include <nav_msgs/msg/odometry.hpp>
@@ -23,40 +24,50 @@
 
 namespace gpn {
 
+    typedef std::shared_ptr<gpn_msgs::srv::ComputeControls::Request> ctrls_req;
+    typedef std::shared_ptr<gpn_msgs::srv::ComputeControls::Response> ctrls_res;
+
     class coordinator : public rclcpp::Node {
 
         private:
 
+            double dt_;
+
             bool debug_;
-            std::string debug_param_;
-
-            double max_lin_vel_, max_ang_vel_;
-            std::string max_lin_vel_param_, max_ang_vel_param_;
-
-            std::string odometry_topic_name_, fish_cmd_topic_name_;
-            std::string odometry_topic_param_, fish_cmd_topic_param_;
-
+            double freq_hz_;
+            double max_lin_vel_;
+            double max_ang_vel_;
+            double controller_timeout_sec_;
             std::string controller_server_name_;
-            std::string controller_server_name_param_;
-
-            int controller_timeout_sec_;
-            std::string controller_timeout_param_;
-
-            double curr_heading_;
-            rclcpp::Time curr_odom_time_;
-            geometry_msgs::msg::Pose curr_pose_;
-            geometry_msgs::msg::Twist curr_twist_;
+            std::string odometry_topic_name_;
+            std::string fish_cmd_topic_name_;
+            
+            const std::string debug_param_ = "debug_stream";
+            const std::string frequency_param_ = "freq_hz";
+            const std::string max_lin_vel_param_ = "max_lin_vel";
+            const std::string max_ang_vel_param_ = "max_ang_vel";
+            const std::string controller_timeout_param_ = "controller_timeout_sec";
+            const std::string controller_server_name_param_ = "controller_server";
+            const std::string odometry_topic_param_ = "odometry_topic";
+            const std::string fish_cmd_topic_param_ = "fish_cmd_topic";
 
             bool waiting_for_init_pose_;
             geometry_msgs::msg::Pose init_pose_;
+
+            gpn_msgs::msg::GpnOdom goal_odom_;
+            gpn_msgs::msg::GpnState curr_state_;
 
             rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom_;
             rclcpp::Subscription<gpn_msgs::msg::FishCmd>::SharedPtr sub_fish_cmd_;
 
             rclcpp::Client<gpn_msgs::srv::ComputeControls>::SharedPtr client_controller_;
 
+            // TODO return msg type rather than shared_ptr to response?
+            ctrls_res compute_controls(const gpn_msgs::msg::GpnOdom& curr, gpn_msgs::msg::GpnOdom& goal);
+
         protected:
 
+            void iterate();
             void odometry_callback(const nav_msgs::msg::Odometry& odom_msg);
             void fish_command_callback(const gpn_msgs::msg::FishCmd& cmd_msg);
 
