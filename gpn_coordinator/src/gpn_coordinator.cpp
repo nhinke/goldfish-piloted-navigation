@@ -1,25 +1,27 @@
 #include <gpn_coordinator/gpn_coordinator.hpp>
 
 gpn::coordinator::coordinator(const std::string& name, const rclcpp::NodeOptions& options) : 
-    Node(name, options), waiting_for_init_pose_(true) {
+    Node(name, options), has_new_goal_(false), waiting_for_init_pose_(true) {
 
     this->initialize_params();
     this->configure();
     dt_ = freq_hz_ > 0.0 ? 1 / freq_hz_ : 0.1;
+    dt_ms_ = (int)std::round(controller_timeout_sec_*1000.0);
     
     sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odometry_topic_name_, 10, std::bind(&gpn::coordinator::odometry_callback, this, std::placeholders::_1));
     sub_fish_cmd_ = this->create_subscription<gpn_msgs::msg::FishCmd>(fish_cmd_topic_name_, 10, std::bind(&gpn::coordinator::fish_command_callback, this, std::placeholders::_1));
 
     rclcpp::Time now = this->now();
     client_controller_ = this->create_client<gpn_msgs::srv::ComputeControls>(controller_server_name_);
-    if (!client_controller_->wait_for_service(std::chrono::milliseconds((int)std::round(controller_timeout_sec_*1000.0)))) {
-        std::cout << "ERROR: could not connect to controller server after waiting for " << controller_timeout_sec_ << " seconds" << std::endl;
+    if (!client_controller_->wait_for_service(std::chrono::milliseconds(dt_ms_))) {
+        RCLCPP_ERROR(this->get_logger(), "ERROR: could not connect to controller server after waiting for %.2f seconds.", controller_timeout_sec_);
         // TODO: decide what should happen if connection unsuccessful --> e.g. retry connect/kill node/carry on
     } else if (debug_) {
-        std::cout << "Successfully connected to controller server at '" << controller_server_name_ << "' after " << (this->now() - now).seconds() << " seconds" << std::endl;
+        RCLCPP_DEBUG(this->get_logger(), "Successfully connected to controller server at '%s' after %.2f seconds.", controller_server_name_.c_str(), (this->now() - now).seconds());
     }
 
-    std::cout << "gpn_coordinator_node constructed successfully" << std::endl;
+    timer_ = this->create_wall_timer(std::chrono::duration<double>(dt_), std::bind(&gpn::coordinator::iterate, this));
+    RCLCPP_DEBUG(this->get_logger(), "gpn_coordinator_node constructed successfully.");
 
 }
 
@@ -87,6 +89,8 @@ void gpn::coordinator::initialize_params() {
 
 void gpn::coordinator::configure() {
 
+    // TODO use proper logger
+
     this->get_parameter<bool>(debug_param_, debug_);
     std::cout << "Debugging stream status:   " << std::boolalpha << debug_ << std::endl;
 
@@ -115,13 +119,15 @@ void gpn::coordinator::configure() {
 
 void gpn::coordinator::odometry_callback(const nav_msgs::msg::Odometry& odom_msg) {
 
+    const std::lock_guard<std::mutex> curr_lock(curr_mutex_);
+
     curr_state_.header = odom_msg.header;
     curr_state_.pose = odom_msg.pose.pose;
     curr_state_.twist = odom_msg.twist.twist;
     curr_state_.heading = tf2::getYaw(odom_msg.pose.pose.orientation);
 
     if (debug_) {
-        std::cout << "Current vehicle heading: " << curr_state_.heading << std::endl;
+        RCLCPP_DEBUG(this->get_logger(), "Current vehicle heading:  %.2f", curr_state_.heading);
     }
 
     if (waiting_for_init_pose_) {
@@ -133,13 +139,12 @@ void gpn::coordinator::odometry_callback(const nav_msgs::msg::Odometry& odom_msg
 
 void gpn::coordinator::fish_command_callback(const gpn_msgs::msg::FishCmd& cmd_msg) {
 
-    if (waiting_for_init_pose_) {
-        std::cout << "ERROR: cannot accept any fish commands until odometry information received" << std::endl;
-        return;
-    }
+    const std::lock_guard<std::mutex> goal_lock(goal_mutex_);
+
+    has_new_goal_ = true;
 
     if (debug_) {
-        std::cout << "Received fish command:  " << cmd_msg.heading << "  " << cmd_msg.magnitude << std::endl;
+        RCLCPP_DEBUG(this->get_logger(), "Received fish command:  heading = %.2f, magnitude = %.2f", cmd_msg.heading, cmd_msg.magnitude);
     }
 
     goal_odom_.header = cmd_msg.header;
@@ -148,18 +153,52 @@ void gpn::coordinator::fish_command_callback(const gpn_msgs::msg::FishCmd& cmd_m
 
 }
 
-gpn::ctrls_res gpn::coordinator::compute_controls(const gpn_msgs::msg::GpnOdom& curr, gpn_msgs::msg::GpnOdom& goal) {
+void gpn::coordinator::compute_controls(const gpn_msgs::msg::GpnState& curr, const gpn_msgs::msg::GpnOdom& goal) {
+
+    const std::lock_guard<std::mutex> curr_lock(curr_mutex_);
+    const std::lock_guard<std::mutex> goal_lock(goal_mutex_);
 
     // TODO: can create3 receive fwd and ang commands at same time?
     std::shared_ptr<gpn_msgs::srv::ComputeControls::Request> ctrls_srv_req;
-    ctrls_srv_req->curr_odom = curr;
+    RCLCPP_INFO(this->get_logger(), "44Sending compute controls request to service server.");
     ctrls_srv_req->goal_odom = goal;
+    RCLCPP_INFO(this->get_logger(), "55Sending compute controls request to service server.");
+
+    ctrls_srv_req->curr_odom.header = curr.header;
+    ctrls_srv_req->curr_odom.heading = curr.heading;
+    ctrls_srv_req->curr_odom.fwd_vel = curr.twist.linear.x;
     
-    // auto ctrls_srv_res = client_controller_->async_send_request(ctrls_srv_req);
+    RCLCPP_INFO(this->get_logger(), "66Sending compute controls request to service server.");
+    RCLCPP_INFO(this->get_logger(), "Sending compute controls request to service server.");
+    
+    rclcpp::Client<gpn_msgs::srv::ComputeControls>::SharedFuture ctrls_srv_future = 
+        client_controller_->async_send_request(ctrls_srv_req, std::bind(&gpn::coordinator::controls_response_callback, this, std::placeholders::_1));
 
 }
 
+void gpn::coordinator::controls_response_callback(rclcpp::Client<gpn_msgs::srv::ComputeControls>::SharedFuture future) {
+    std::future_status status = future.wait_for(std::chrono::milliseconds(dt_ms_));
+    RCLCPP_INFO(this->get_logger(), "ready: %d, deferred: %d, timeout: %d", status == std::future_status::ready, status == std::future_status::deferred, status == std::future_status::timeout);
+    while (status != std::future_status::ready) {
+        RCLCPP_INFO(this->get_logger(), "ready: %d, deferred: %d, timeout: %d", status == std::future_status::ready, status == std::future_status::deferred, status == std::future_status::timeout);
+    }
+}
+
 void gpn::coordinator::iterate() {
-    //       be sure to consider what happens if you haven't received a fish command for a while --> whether to keep sending same command or start sending zeros)
-    // TODO: implement timer-based publisher of velocity commands to robot with configurable frequency,
+
+    // if no goal state 
+    if (!has_new_goal_) {
+        // be sure to consider what happens if you haven't received a fish command for a while --> whether to keep sending same command or start sending zeros)
+        // publish current state as command?
+        return;
+    }
+
+    // if waiting for initial pose
+    if (waiting_for_init_pose_) {
+        RCLCPP_DEBUG(this->get_logger(), "Waiting for initial odometry measurements.");
+        return;
+    }
+
+    compute_controls(curr_state_, goal_odom_);
+
 }

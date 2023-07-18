@@ -2,6 +2,7 @@
 
     <let name="param_config_file" value="$(find-pkg-share gpn_config)/config/gpn_ros_params.yaml"/>
      
+    <!-- <node pkg="gpn_coordinator" exec="gpn_coordinator_node" name="gpn_coordinator" output="screen"> -->
     <node pkg="gpn_coordinator" exec="gpn_coordinator_node" name="gpn_coordinator" output="screen">
         <param from="$(var param_config_file)"/>
     </node>
