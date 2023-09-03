@@ -6,7 +6,22 @@ The purpose of this repo is to develop a system that allows a goldfish to pilot 
   
 ## Dependencies
 
-TODO
+- [ros2 galactic](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+- [create3_sim](https://github.com/iRobotEducation/create3_sim/tree/galactic)
+- [aws-robomaker-small-house-world](https://github.com/aws-robotics/aws-robomaker-small-house-world/tree/ros2)
+
+## Launch Sim
+
+To launch empty world sim:
+```bash
+ros2 launch irobot_create_gazebo_bringup create3_gazebo.launch.py
+ros2 launch irobot_create_gazebo_bringup create3_gazebo_aws_small.launch.py
+```
+
+To launch aws house sim:
+```bash
+
+```
 
 ## References
   
